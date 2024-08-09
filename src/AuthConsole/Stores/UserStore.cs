@@ -5,6 +5,7 @@ namespace AuthConsole.Stores;
 
 public class UserStore : IUserStore
 {
+    private const string AppAccount = "APP";
     public ValueTask<NatsUserResult> GetUserAsync(string user, string password, CancellationToken cancellationToken)
     {
         // simulate read-only for steve
@@ -22,11 +23,12 @@ public class UserStore : IUserStore
         return new ValueTask<NatsUserResult>(new NatsUserResult
         {
             Success = true,
+            Account = AppAccount,
             User = new NatsUser
             {
                 Pub = readOnly ? noPublish : basePublish,
                 Sub = baseSubscribe,
-                Resp = new NatsResponsePermission { MaxMsgs = 1 }
+                Resp = new NatsResponsePermission { MaxMsgs = 1 }, 
             }
         });
     }

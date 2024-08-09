@@ -28,24 +28,11 @@ namespace AuthConsole.Auth
         public async ValueTask<NatsAuthorizationResponseClaims> HandleAsync(NatsAuthorizationRequest authRequest,
             CancellationToken cancellationToken)
         {
-            var kp = KeyPair.FromSeed(authConfig.SigningKey);
+            var keyPair = KeyPair.FromSeed(authConfig.SigningKey);
             var userResult = await userStore.GetUserAsync(
                 authRequest.NatsConnectOptions.Username,
                 authRequest.NatsConnectOptions.Password,
                 cancellationToken);
-
-            var jwtClaims = new NatsUserClaims
-            {
-                Audience = "APP",
-                Name = authRequest.NatsConnectOptions.Username,
-                Subject = authRequest.UserNKey
-            };
-
-            if (userResult.Success)
-                jwtClaims.User = userResult.User!;
-
-            var userJwt = jwtUtil.EncodeUserClaims(jwtClaims, kp, DateTimeOffset.UtcNow);
-            Log.Debug("User Jwt: {Jwt}", userJwt);
 
             var response = new NatsAuthorizationResponseClaims
             {
@@ -53,10 +40,25 @@ namespace AuthConsole.Auth
                 Subject = authRequest.UserNKey,
                 AuthorizationResponse = new NatsAuthorizationResponse()
             };
+
             if (userResult.Success)
-                response.AuthorizationResponse.Jwt = userJwt;
+            {
+                var jwtClaims = new NatsUserClaims
+                {
+                    Name = authRequest.NatsConnectOptions.Username,
+                    Subject = authRequest.UserNKey,
+                    Audience = userResult.Account!,
+                    User = userResult.User!
+                };
+
+                response.AuthorizationResponse.Jwt = jwtUtil.EncodeUserClaims(jwtClaims, keyPair, DateTimeOffset.UtcNow);
+                
+                Log.Debug("User Jwt: {Jwt}", response.AuthorizationResponse.Jwt);
+            }
             else
+            {
                 response.AuthorizationResponse.Error = userResult.Error ?? "Error in AuthHandler";
+            }
 
             return response;
         }

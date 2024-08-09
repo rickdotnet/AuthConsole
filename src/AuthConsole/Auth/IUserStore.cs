@@ -9,6 +9,7 @@ public interface IUserStore
 public record NatsUserResult
 {
     public bool Success { get; init; }
+    public string? Account { get; set; }
     public NatsUser? User { get; init; }
     public string? Error { get; init; } 
 }
