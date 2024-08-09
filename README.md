@@ -42,3 +42,33 @@ authorization {
   }
 }
 ```
+
+**NATS CLI Context** - local CLI context for bob
+```
+{
+  "description": "NATS Local Bob",
+  "url": "nats://localhost:4222",
+  "socks_proxy": "",
+  "token": "",
+  "user": "bob",
+  "password": "bob",
+  "creds": "",
+  "nkey": "",
+  "cert": "",
+  "key": "",
+  "ca": "",
+  "nsc": "",
+  "jetstream_domain": "",
+  "jetstream_api_prefix": "",
+  "jetstream_event_prefix": "",
+  "inbox_prefix": "",
+  "user_jwt": "",
+  "color_scheme": "",
+  "tls_first": false
+}
+```
+
+Send a message, as Bob
+```
+nats pub bob.test "test"
+```
