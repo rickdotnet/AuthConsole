@@ -1,0 +1,6 @@
+{
+  "NatsUrl": "nats://localhost:4222",
+  "Username": "authuser",
+  "Password": "changeme",
+  "SigningKey": "not implemented yet"
+}
